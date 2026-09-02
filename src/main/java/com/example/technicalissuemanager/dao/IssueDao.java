@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Reads Issue records from MySQL.
@@ -21,6 +22,11 @@ public class IssueDao {
             "SELECT id, title, customer, product, priority, status, progress, "
                     + "assignee, due_date, description, created_at, updated_at "
                     + "FROM issues ORDER BY id";
+
+    private static final String FIND_BY_ID_SQL =
+            "SELECT id, title, customer, product, priority, status, progress, "
+                    + "assignee, due_date, description, created_at, updated_at "
+                    + "FROM issues WHERE id = ?";
 
     public List<Issue> findAll() throws SQLException {
         List<Issue> issues = new ArrayList<>();
@@ -35,6 +41,22 @@ public class IssueDao {
         }
 
         return issues;
+    }
+
+    public Optional<Issue> findById(int id) throws SQLException {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_BY_ID_SQL)) {
+
+            statement.setInt(1, id);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return Optional.of(mapIssue(resultSet));
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 
     private Issue mapIssue(ResultSet resultSet) throws SQLException {

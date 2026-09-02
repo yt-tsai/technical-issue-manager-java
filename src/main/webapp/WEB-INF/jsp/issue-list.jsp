@@ -25,7 +25,7 @@
     for (Issue issue : issues) {
 %>
     <section class="issue">
-        <h2>#<%= issue.getId() %> <%= issue.getTitle() %></h2>
+        <h2><a href="<%= request.getContextPath() %>/issues/detail?id=<%= issue.getId() %>">#<%= issue.getId() %> <%= issue.getTitle() %></a></h2>
         <p class="meta">顧客：<%= issue.getCustomer() %> ／ 製品・プロジェクト：<%= issue.getProduct() %></p>
         <p class="meta">優先度：<%= issue.getPriority() %> ／ 状況：<%= issue.getStatus() %></p>
         <p class="meta">担当者：<%= issue.getAssignee() %> ／ 期限：<%= issue.getDueDate() %></p>
