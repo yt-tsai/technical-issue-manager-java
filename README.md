@@ -1,49 +1,30 @@
 # Technical Issue Manager
 
-A student portfolio project that evolves a Python CLI prototype into a Java web application for managing technical issues.
+A student portfolio project that evolves the Python CLI prototype **技術課題管理システム** into a Java web application for managing technical issues.
 
-## Current Phase
+## Phase 1 Status
 
-Phase 1: build the first Java / Servlet / JSP / MySQL version from the Python prototype.
+Phase 1 is functionally complete. It provides the first Java / Servlet / JSP / MySQL version of the original Python prototype.
 
-The current implementation is the initial Maven web application skeleton. Business features will be added incrementally.
+## Features
+
+- Issue list with live comment counts
+- Issue detail view
+- Create, edit, and delete issues
+- Keyword search across issue fields
+- Statistics by status and priority
+- Add comments with To and CC recipients
+- Reply to a comment
+- MySQL persistence with UTF-8 support
 
 ## Technology
 
 - Java 21
 - Maven
-- Servlet / JSP
-- MySQL (planned)
-
-## Current Progress
-
-### Completed
-
-- Inspected the Python CLI prototype and its JSON data format
-- Created the Maven WAR project structure
-- Added UTF-8 build settings
-- Added a basic `web.xml`
-- Added `.gitignore` for Maven, IDE, macOS, and local environment files
-
-### Planned for Phase 1
-
-- Define `Issue` and `Comment` domain classes
-- Create the MySQL schema
-- Add database connection utilities
-- Implement issue list, detail, create, update, and delete
-- Implement search and statistics
-- Implement comments and reply-to-comment
-- Add basic JSP pages
-
-## Reference Prototype
-
-The original Python prototype is kept under:
-
-```text
-Reference Sample_Python prototype/technical-issue-manager/prototype-python/
-```
-
-It provides the behavior reference for issue management, statistics, comments, replies, issue details, JSON persistence, and compatibility with older records.
+- Jakarta Servlet API 6.0
+- JSP
+- MySQL 8.0+
+- Apache Tomcat 11 for local development
 
 ## Project Structure
 
@@ -51,29 +32,123 @@ It provides the behavior reference for issue management, statistics, comments, r
 technical-issue-manager-java/
 ├── pom.xml
 ├── README.md
-├── AGENTS.md
 ├── docs/
+│   └── phase1-manual-test-checklist.md
 └── src/
-    ├── main/
-    │   ├── java/
-    │   ├── resources/
-    │   └── webapp/WEB-INF/
-    │       ├── jsp/
-    │       └── web.xml
-    └── test/java/
+    └── main/
+        ├── java/com/example/technicalissuemanager/
+        │   ├── dao/
+        │   ├── model/
+        │   ├── servlet/
+        │   └── util/
+        ├── resources/sql/
+        │   ├── schema.sql
+        │   └── sample-data.sql
+        └── webapp/WEB-INF/
+            ├── jsp/
+            └── web.xml
 ```
 
-## Build and Test
+## Database Setup
 
-Run the following commands from the project root:
+Use a local MySQL administrator account to create the database and a project-specific application account. Replace the example password with your own local password.
+
+```sql
+CREATE DATABASE technical_issue_manager
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+CREATE USER 'technical_issue_app'@'localhost'
+    IDENTIFIED BY 'choose-a-local-password';
+
+GRANT ALL PRIVILEGES ON technical_issue_manager.*
+    TO 'technical_issue_app'@'localhost';
+
+FLUSH PRIVILEGES;
+```
+
+Apply the schema from the project root:
 
 ```bash
-mvn test
-mvn package
+mysql -u technical_issue_app -p technical_issue_manager \
+  < src/main/resources/sql/schema.sql
 ```
 
-The generated WAR file will be placed in `target/`.
+Optional: load the included baseline sample issues.
+
+```bash
+mysql -u technical_issue_app -p technical_issue_manager \
+  < src/main/resources/sql/sample-data.sql
+```
+
+## Database Configuration
+
+The application reads database settings in this order:
+
+1. Environment variables
+2. Java system properties
+3. Local development defaults in `DatabaseConnection.java`
+
+For a Tomcat process started from a terminal, configure environment variables in that same terminal before starting Tomcat:
+
+```bash
+export DB_URL="jdbc:mysql://localhost:3306/technical_issue_manager?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Tokyo"
+export DB_USER="technical_issue_app"
+export DB_PASSWORD="your-local-password"
+```
+
+For a service-managed Tomcat installation, configure the equivalent values in the service environment or as JVM properties:
+
+```text
+-Ddb.url=...
+-Ddb.user=technical_issue_app
+-Ddb.password=your-local-password
+```
+
+Real credentials are intentionally not part of this repository. Keep them in local environment or service configuration and never add them to version control.
+
+## Build and Run
+
+Build the WAR file:
+
+```bash
+mvn clean package
+```
+
+The generated file is:
+
+```text
+target/technical-issue-manager.war
+```
+
+For the local Homebrew Tomcat setup used during development:
+
+```bash
+cp target/technical-issue-manager.war /opt/homebrew/opt/tomcat/libexec/webapps/technical-issue-manager.war
+brew services restart tomcat
+```
+
+Open the application:
+
+```text
+http://localhost:8080/technical-issue-manager/issues
+```
+
+## Main Pages
+
+| Function | URL |
+| --- | --- |
+| Issue list | `/issues` |
+| Create issue | `/issues/create` |
+| Issue detail | `/issues/detail?id=1` |
+| Edit issue | `/issues/edit?id=1` |
+| Search | `/issues/search` |
+| Statistics | `/issues/statistics` |
+
+## Verification
+
+See [Phase 1 manual test checklist](docs/phase1-manual-test-checklist.md).
 
 ## Scope
 
-Only Phase 1 is being implemented at this stage. UI refinement, stronger validation, documentation, presentation preparation, deployment preparation, and final refactoring are reserved for later phases.
+This repository currently covers Phase 1 only. Phase 2 will address UI refinement, stronger validation, error-handling cleanup, and search or comment-display improvements. Phase 3 will cover formal tests, presentation preparation, final refactoring, and deployment preparation.
