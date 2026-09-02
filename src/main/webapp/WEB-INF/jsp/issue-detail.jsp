@@ -18,6 +18,9 @@
         .progress-bar { background: #3b82f6; height: 100%; }
         .back-link { display: inline-block; margin-bottom: 1.5rem; }
         .edit-link { display: inline-block; margin-top: 1rem; }
+        .actions { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
+        .delete-form { margin: 0; }
+        .delete-button { color: #b91c1c; cursor: pointer; }
         .comments { margin-top: 2rem; border-top: 1px solid #ccc; padding-top: 1rem; }
     </style>
 </head>
@@ -37,7 +40,12 @@
         <p class="meta">担当者：<%= issue.getAssignee() %> ／ 期限：<%= issue.getDueDate() %></p>
         <h3>詳細説明</h3>
         <p class="description"><%= issue.getDescription() %></p>
-        <a class="edit-link" href="<%= request.getContextPath() %>/issues/edit?id=<%= issue.getId() %>">編集</a>
+        <div class="actions">
+            <a class="edit-link" href="<%= request.getContextPath() %>/issues/edit?id=<%= issue.getId() %>">編集</a>
+            <form class="delete-form" action="<%= request.getContextPath() %>/issues/delete?id=<%= issue.getId() %>" method="post" onsubmit="return confirm('この課題を削除しますか？ この操作は元に戻せません。');">
+                <button class="delete-button" type="submit">削除</button>
+            </form>
+        </div>
     </section>
 
     <section class="comments">

@@ -39,6 +39,8 @@ public class IssueDao {
                     + "status = ?, progress = ?, assignee = ?, due_date = ?, description = ?, "
                     + "updated_at = CURRENT_TIMESTAMP WHERE id = ?";
 
+    private static final String DELETE_SQL = "DELETE FROM issues WHERE id = ?";
+
     public List<Issue> findAll() throws SQLException {
         List<Issue> issues = new ArrayList<>();
 
@@ -114,6 +116,15 @@ public class IssueDao {
             statement.setString(9, issue.getDescription());
             statement.setInt(10, issue.getId());
 
+            return statement.executeUpdate() == 1;
+        }
+    }
+
+    public boolean deleteById(int id) throws SQLException {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(DELETE_SQL)) {
+
+            statement.setInt(1, id);
             return statement.executeUpdate() == 1;
         }
     }
