@@ -1,0 +1,15 @@
+# Maven build output
+target/
+
+# IDE settings
+.idea/
+*.iml
+.vscode/
+
+# macOS
+.DS_Store
+
+# Local environment and secrets
+.env
+*.local
+
