@@ -21,8 +21,14 @@ public final class DatabaseConnection {
 
     public static Connection getConnection() throws SQLException {
         String url = getValue("DB_URL", "db.url", DEFAULT_URL);
-        String user = getRequiredValue("DB_USER", "db.user");
+        String user = getValue("DB_USER", "db.user", "root");
         String password = getValue("DB_PASSWORD", "db.password", "");
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException exception) {
+            throw new SQLException("MySQL JDBC driver was not found.", exception);
+        }
 
         return DriverManager.getConnection(url, user, password);
     }
