@@ -1,6 +1,8 @@
 package com.example.technicalissuemanager.servlet;
 
 import com.example.technicalissuemanager.dao.IssueDao;
+import com.example.technicalissuemanager.dao.CommentDao;
+import com.example.technicalissuemanager.model.Comment;
 import com.example.technicalissuemanager.model.Issue;
 
 import jakarta.servlet.ServletException;
@@ -17,6 +19,7 @@ import java.util.Optional;
 public class IssueDetailServlet extends HttpServlet {
 
     private final IssueDao issueDao = new IssueDao();
+    private final CommentDao commentDao = new CommentDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -40,6 +43,7 @@ public class IssueDetailServlet extends HttpServlet {
             }
 
             request.setAttribute("issue", issue.get());
+            request.setAttribute("comments", commentDao.findByIssueId(issueId));
             request.getRequestDispatcher("/WEB-INF/jsp/issue-detail.jsp").forward(request, response);
         } catch (SQLException exception) {
             throw new ServletException("課題詳細の取得に失敗しました。", exception);
