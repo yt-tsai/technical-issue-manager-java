@@ -17,6 +17,7 @@
         .progress-bar { background: #3b82f6; height: 100%; }
         .create-link { display: inline-block; margin-bottom: 1rem; }
         .search-link { display: inline-block; margin: 0 0 1rem 1rem; }
+        .statistics-link { display: inline-block; margin: 0 0 1rem 1rem; }
     </style>
 </head>
 <body>
@@ -24,6 +25,7 @@
     <h2>課題一覧</h2>
     <a class="create-link" href="<%= request.getContextPath() %>/issues/create">＋ 課題を新規登録</a>
     <a class="search-link" href="<%= request.getContextPath() %>/issues/search">課題検索</a>
+    <a class="statistics-link" href="<%= request.getContextPath() %>/issues/statistics">課題集計</a>
 <%
     List<Issue> issues = (List<Issue>) request.getAttribute("issues");
     for (Issue issue : issues) {

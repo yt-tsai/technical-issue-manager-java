@@ -1,6 +1,7 @@
 package com.example.technicalissuemanager.dao;
 
 import com.example.technicalissuemanager.model.Issue;
+import com.example.technicalissuemanager.model.IssueStatistics;
 import com.example.technicalissuemanager.util.DatabaseConnection;
 
 import java.sql.Connection;
@@ -47,6 +48,16 @@ public class IssueDao {
                     + "WHERE LOWER(title) LIKE ? OR LOWER(customer) LIKE ? OR LOWER(product) LIKE ? "
                     + "OR LOWER(priority) LIKE ? OR LOWER(status) LIKE ? OR LOWER(assignee) LIKE ? "
                     + "OR CAST(due_date AS CHAR) LIKE ? OR LOWER(description) LIKE ? ORDER BY id";
+
+    private static final String STATISTICS_SQL =
+            "SELECT COUNT(*) AS total_count, "
+                    + "SUM(CASE WHEN status = 'Open' THEN 1 ELSE 0 END) AS open_count, "
+                    + "SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) AS in_progress_count, "
+                    + "SUM(CASE WHEN status = 'Resolved' THEN 1 ELSE 0 END) AS resolved_count, "
+                    + "SUM(CASE WHEN priority = 'High' THEN 1 ELSE 0 END) AS high_count, "
+                    + "SUM(CASE WHEN priority = 'Medium' THEN 1 ELSE 0 END) AS medium_count, "
+                    + "SUM(CASE WHEN priority = 'Low' THEN 1 ELSE 0 END) AS low_count "
+                    + "FROM issues";
 
     public List<Issue> findAll() throws SQLException {
         List<Issue> issues = new ArrayList<>();
@@ -146,6 +157,23 @@ public class IssueDao {
         }
 
         return issues;
+    }
+
+    public IssueStatistics getStatistics() throws SQLException {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(STATISTICS_SQL);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            resultSet.next();
+            return new IssueStatistics(
+                    resultSet.getInt("total_count"),
+                    resultSet.getInt("open_count"),
+                    resultSet.getInt("in_progress_count"),
+                    resultSet.getInt("resolved_count"),
+                    resultSet.getInt("high_count"),
+                    resultSet.getInt("medium_count"),
+                    resultSet.getInt("low_count"));
+        }
     }
 
     public boolean deleteById(int id) throws SQLException {
