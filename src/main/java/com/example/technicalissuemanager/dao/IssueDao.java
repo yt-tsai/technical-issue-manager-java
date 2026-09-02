@@ -34,6 +34,11 @@ public class IssueDao {
                     + "assignee, due_date, description, created_at, updated_at) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 
+    private static final String UPDATE_SQL =
+            "UPDATE issues SET title = ?, customer = ?, product = ?, priority = ?, "
+                    + "status = ?, progress = ?, assignee = ?, due_date = ?, description = ?, "
+                    + "updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+
     public List<Issue> findAll() throws SQLException {
         List<Issue> issues = new ArrayList<>();
 
@@ -92,6 +97,25 @@ public class IssueDao {
         }
 
         throw new SQLException("登録した課題のIDを取得できませんでした。");
+    }
+
+    public boolean update(Issue issue) throws SQLException {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE_SQL)) {
+
+            statement.setString(1, issue.getTitle());
+            statement.setString(2, issue.getCustomer());
+            statement.setString(3, issue.getProduct());
+            statement.setString(4, issue.getPriority());
+            statement.setString(5, issue.getStatus());
+            statement.setInt(6, issue.getProgress());
+            statement.setString(7, issue.getAssignee());
+            statement.setDate(8, Date.valueOf(issue.getDueDate()));
+            statement.setString(9, issue.getDescription());
+            statement.setInt(10, issue.getId());
+
+            return statement.executeUpdate() == 1;
+        }
     }
 
     private Issue mapIssue(ResultSet resultSet) throws SQLException {

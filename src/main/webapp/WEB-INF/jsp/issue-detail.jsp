@@ -17,6 +17,7 @@
         .progress { background: #eee; border-radius: 4px; height: 1rem; overflow: hidden; }
         .progress-bar { background: #3b82f6; height: 100%; }
         .back-link { display: inline-block; margin-bottom: 1.5rem; }
+        .edit-link { display: inline-block; margin-top: 1rem; }
         .comments { margin-top: 2rem; border-top: 1px solid #ccc; padding-top: 1rem; }
     </style>
 </head>
@@ -36,6 +37,7 @@
         <p class="meta">担当者：<%= issue.getAssignee() %> ／ 期限：<%= issue.getDueDate() %></p>
         <h3>詳細説明</h3>
         <p class="description"><%= issue.getDescription() %></p>
+        <a class="edit-link" href="<%= request.getContextPath() %>/issues/edit?id=<%= issue.getId() %>">編集</a>
     </section>
 
     <section class="comments">
