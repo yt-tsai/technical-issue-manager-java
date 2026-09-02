@@ -5,4 +5,7 @@
                              https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
     <display-name>Technical Issue Manager</display-name>
+    <welcome-file-list>
+        <welcome-file>issues</welcome-file>
+    </welcome-file-list>
 </web-app>
