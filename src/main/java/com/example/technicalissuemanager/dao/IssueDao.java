@@ -41,6 +41,13 @@ public class IssueDao {
 
     private static final String DELETE_SQL = "DELETE FROM issues WHERE id = ?";
 
+    private static final String SEARCH_SQL =
+            "SELECT id, title, customer, product, priority, status, progress, "
+                    + "assignee, due_date, description, created_at, updated_at FROM issues "
+                    + "WHERE LOWER(title) LIKE ? OR LOWER(customer) LIKE ? OR LOWER(product) LIKE ? "
+                    + "OR LOWER(priority) LIKE ? OR LOWER(status) LIKE ? OR LOWER(assignee) LIKE ? "
+                    + "OR CAST(due_date AS CHAR) LIKE ? OR LOWER(description) LIKE ? ORDER BY id";
+
     public List<Issue> findAll() throws SQLException {
         List<Issue> issues = new ArrayList<>();
 
@@ -118,6 +125,27 @@ public class IssueDao {
 
             return statement.executeUpdate() == 1;
         }
+    }
+
+    public List<Issue> findByKeyword(String keyword) throws SQLException {
+        List<Issue> issues = new ArrayList<>();
+        String searchKeyword = "%" + keyword.toLowerCase() + "%";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SEARCH_SQL)) {
+
+            for (int index = 1; index <= 8; index++) {
+                statement.setString(index, searchKeyword);
+            }
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    issues.add(mapIssue(resultSet));
+                }
+            }
+        }
+
+        return issues;
     }
 
     public boolean deleteById(int id) throws SQLException {
