@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,11 @@ public class IssueDao {
             "SELECT id, title, customer, product, priority, status, progress, "
                     + "assignee, due_date, description, created_at, updated_at "
                     + "FROM issues WHERE id = ?";
+
+    private static final String INSERT_SQL =
+            "INSERT INTO issues (title, customer, product, priority, status, progress, "
+                    + "assignee, due_date, description, created_at, updated_at) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
 
     public List<Issue> findAll() throws SQLException {
         List<Issue> issues = new ArrayList<>();
@@ -57,6 +63,35 @@ public class IssueDao {
         }
 
         return Optional.empty();
+    }
+
+    public int save(Issue issue) throws SQLException {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+
+            statement.setString(1, issue.getTitle());
+            statement.setString(2, issue.getCustomer());
+            statement.setString(3, issue.getProduct());
+            statement.setString(4, issue.getPriority());
+            statement.setString(5, issue.getStatus());
+            statement.setInt(6, issue.getProgress());
+            statement.setString(7, issue.getAssignee());
+            statement.setDate(8, Date.valueOf(issue.getDueDate()));
+            statement.setString(9, issue.getDescription());
+
+            if (statement.executeUpdate() != 1) {
+                throw new SQLException("課題の登録に失敗しました。");
+            }
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                }
+            }
+        }
+
+        throw new SQLException("登録した課題のIDを取得できませんでした。");
     }
 
     private Issue mapIssue(ResultSet resultSet) throws SQLException {
