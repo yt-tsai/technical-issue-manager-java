@@ -21,6 +21,7 @@ public class Issue {
     private LocalDate dueDate;
     private String description;
     private List<Comment> comments = new ArrayList<>();
+    private int commentCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -138,6 +139,14 @@ public class Issue {
         if (comment != null) {
             comments.add(comment);
         }
+    }
+
+    public int getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -30,6 +30,9 @@ public class CommentDao {
             "INSERT INTO comment_cc (comment_id, cc_order, cc_name) VALUES (?, ?, ?)";
     private static final String UPDATE_ISSUE_TIMESTAMP_SQL =
             "UPDATE issues SET updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+    private static final String EXISTS_BY_ID_AND_ISSUE_ID_SQL =
+            "SELECT 1 FROM comments WHERE comment_id = ? AND issue_id = ?";
+
 
     public List<Comment> findByIssueId(int issueId) throws SQLException {
         List<Comment> comments = new ArrayList<>();
@@ -58,6 +61,18 @@ public class CommentDao {
         }
 
         return comments;
+    }
+
+    public boolean existsByIdAndIssueId(int commentId, int issueId) throws SQLException {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(EXISTS_BY_ID_AND_ISSUE_ID_SQL)) {
+
+            statement.setInt(1, commentId);
+            statement.setInt(2, issueId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
+        }
     }
 
     public int save(int issueId, Comment comment) throws SQLException {

@@ -43,12 +43,31 @@ public class CommentCreateServlet extends HttpServlet {
                 return;
             }
 
-            commentDao.save(issueId, createComment(request, issue.get()));
+            Comment comment = createComment(request, issue.get());
+            comment.setReplyTo(parseReplyTo(request, issueId));
+            commentDao.save(issueId, comment);
             response.sendRedirect(request.getContextPath() + "/issues/detail?id=" + issueId);
         } catch (IllegalArgumentException exception) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, exception.getMessage());
         } catch (SQLException exception) {
             throw new ServletException("コメントの登録に失敗しました。", exception);
+        }
+    }
+
+    private Integer parseReplyTo(HttpServletRequest request, int issueId) throws SQLException {
+        String replyToValue = request.getParameter("replyTo");
+        if (replyToValue == null || replyToValue.isBlank()) {
+            return null;
+        }
+
+        try {
+            int replyTo = Integer.parseInt(replyToValue);
+            if (!commentDao.existsByIdAndIssueId(replyTo, issueId)) {
+                throw new IllegalArgumentException("返信元のコメントが見つかりません。");
+            }
+            return replyTo;
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("返信元のコメント番号が正しくありません。");
         }
     }
 

@@ -5,6 +5,7 @@
 <%
     Issue issue = (Issue) request.getAttribute("issue");
     List<Comment> comments = (List<Comment>) request.getAttribute("comments");
+    String replyTo = request.getParameter("replyTo");
 %>
 <!DOCTYPE html>
 <html lang="ja">
@@ -27,6 +28,7 @@
         .comments { margin-top: 2rem; border-top: 1px solid #ccc; padding-top: 1rem; max-width: 760px; }
         .comment { margin: 1rem 0; }
         .comment h3 { margin-top: 0; }
+        .reply-link { display: inline-block; margin-top: 0.5rem; }
         .comment-form { margin-top: 1.5rem; }
         .field { margin: 1rem 0; }
         label { display: block; font-weight: bold; margin-bottom: 0.35rem; }
@@ -75,13 +77,20 @@
             <p class="meta">CC：<%= comment.getCc().isEmpty() ? "なし" : String.join(", ", comment.getCc()) %></p>
             <p class="comment-content"><%= comment.getContent() %></p>
             <p class="meta">日時：<%= comment.getCreatedAt() %></p>
+            <a class="reply-link" href="<%= request.getContextPath() %>/issues/detail?id=<%= issue.getId() %>&replyTo=<%= comment.getCommentId() %>#comment-form">返信</a>
         </article>
 <%     }
    } %>
 
-        <form class="comment-form" action="<%= request.getContextPath() %>/comments/create" method="post">
+        <form id="comment-form" class="comment-form" action="<%= request.getContextPath() %>/comments/create" method="post">
             <input type="hidden" name="issueId" value="<%= issue.getId() %>">
+<% if (replyTo != null && !replyTo.isBlank()) { %>
+            <input type="hidden" name="replyTo" value="<%= replyTo %>">
+            <h3>#<%= replyTo %> への返信</h3>
+            <p><a href="<%= request.getContextPath() %>/issues/detail?id=<%= issue.getId() %>#comment-form">返信を取り消す</a></p>
+<% } else { %>
             <h3>コメントを追加</h3>
+<% } %>
             <div class="field">
                 <label for="author">投稿者</label>
                 <input id="author" name="author" type="text" maxlength="255" required>

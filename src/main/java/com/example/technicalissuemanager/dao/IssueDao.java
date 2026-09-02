@@ -22,12 +22,12 @@ public class IssueDao {
 
     private static final String FIND_ALL_SQL =
             "SELECT id, title, customer, product, priority, status, progress, "
-                    + "assignee, due_date, description, created_at, updated_at "
+                    + "assignee, due_date, description, created_at, updated_at, (SELECT COUNT(*) FROM comments WHERE comments.issue_id = issues.id) AS comment_count "
                     + "FROM issues ORDER BY id";
 
     private static final String FIND_BY_ID_SQL =
             "SELECT id, title, customer, product, priority, status, progress, "
-                    + "assignee, due_date, description, created_at, updated_at "
+                    + "assignee, due_date, description, created_at, updated_at, (SELECT COUNT(*) FROM comments WHERE comments.issue_id = issues.id) AS comment_count "
                     + "FROM issues WHERE id = ?";
 
     private static final String INSERT_SQL =
@@ -202,6 +202,7 @@ public class IssueDao {
         }
 
         issue.setDescription(resultSet.getString("description"));
+        issue.setCommentCount(resultSet.getInt("comment_count"));
 
         Timestamp createdAt = resultSet.getTimestamp("created_at");
         if (createdAt != null) {

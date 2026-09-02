@@ -36,6 +36,7 @@
         <p class="meta">優先度：<%= issue.getPriority() %> ／ 状況：<%= issue.getStatus() %></p>
         <p class="meta">担当者：<%= issue.getAssignee() %> ／ 期限：<%= issue.getDueDate() %></p>
         <p><%= issue.getDescription() %></p>
+        <p>コメント：<%= issue.getCommentCount() %>件</p>
         <p>進捗率：<%= issue.getProgress() %>%</p>
         <div class="progress" aria-label="進捗率 <%= issue.getProgress() %>%">
             <div class="progress-bar" style="width: <%= issue.getProgress() %>%"></div>
