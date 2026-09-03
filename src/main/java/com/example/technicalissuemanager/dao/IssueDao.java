@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -42,14 +43,16 @@ public class IssueDao {
 
     private static final String DELETE_SQL = "DELETE FROM issues WHERE id = ?";
 
-    private static final String SEARCH_SQL =
+    private static final String SEARCH_SELECT_SQL =
             "SELECT id, title, customer, product, priority, status, progress, "
                     + "assignee, due_date, description, created_at, updated_at, "
                     + "(SELECT COUNT(*) FROM comments WHERE comments.issue_id = issues.id) AS comment_count "
-                    + "FROM issues "
-                    + "WHERE LOWER(title) LIKE ? OR LOWER(customer) LIKE ? OR LOWER(product) LIKE ? "
+                    + "FROM issues WHERE 1 = 1";
+
+    private static final String KEYWORD_FILTER_SQL =
+            " AND (LOWER(title) LIKE ? OR LOWER(customer) LIKE ? OR LOWER(product) LIKE ? "
                     + "OR LOWER(priority) LIKE ? OR LOWER(status) LIKE ? OR LOWER(assignee) LIKE ? "
-                    + "OR CAST(due_date AS CHAR) LIKE ? OR LOWER(description) LIKE ? ORDER BY id";
+                    + "OR CAST(due_date AS CHAR) LIKE ? OR LOWER(description) LIKE ?)";
 
     private static final String STATISTICS_SQL =
             "SELECT COUNT(*) AS total_count, "
@@ -141,14 +144,41 @@ public class IssueDao {
     }
 
     public List<Issue> findByKeyword(String keyword) throws SQLException {
+        return search(keyword, "", "", "id-asc");
+    }
+
+    public List<Issue> search(String keyword, String priority, String status, String sort)
+            throws SQLException {
         List<Issue> issues = new ArrayList<>();
-        String searchKeyword = "%" + keyword.toLowerCase() + "%";
+        List<String> parameters = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(SEARCH_SELECT_SQL);
+
+        String normalizedKeyword = keyword == null ? "" : keyword.trim().toLowerCase(Locale.ROOT);
+        if (!normalizedKeyword.isEmpty()) {
+            sql.append(KEYWORD_FILTER_SQL);
+            String searchKeyword = "%" + normalizedKeyword + "%";
+            for (int index = 0; index < 8; index++) {
+                parameters.add(searchKeyword);
+            }
+        }
+
+        if (priority != null && !priority.isBlank()) {
+            sql.append(" AND priority = ?");
+            parameters.add(priority);
+        }
+
+        if (status != null && !status.isBlank()) {
+            sql.append(" AND status = ?");
+            parameters.add(status);
+        }
+
+        sql.append(resolveSearchOrderBy(sort));
 
         try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SEARCH_SQL)) {
+             PreparedStatement statement = connection.prepareStatement(sql.toString())) {
 
-            for (int index = 1; index <= 8; index++) {
-                statement.setString(index, searchKeyword);
+            for (int index = 0; index < parameters.size(); index++) {
+                statement.setString(index + 1, parameters.get(index));
             }
 
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -159,6 +189,21 @@ public class IssueDao {
         }
 
         return issues;
+    }
+
+    private String resolveSearchOrderBy(String sort) {
+        if ("updated-desc".equals(sort)) {
+            return " ORDER BY updated_at DESC, id DESC";
+        }
+        if ("due-asc".equals(sort)) {
+            return " ORDER BY due_date ASC, id ASC";
+        }
+        if ("priority-desc".equals(sort)) {
+            return " ORDER BY CASE priority "
+                    + "WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 WHEN 'Low' THEN 3 ELSE 4 END, "
+                    + "due_date ASC, id ASC";
+        }
+        return " ORDER BY id ASC";
     }
 
     public IssueStatistics getStatistics() throws SQLException {
