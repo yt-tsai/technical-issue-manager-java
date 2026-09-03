@@ -2,19 +2,22 @@
 
 A student portfolio project that evolves the Python CLI prototype **技術課題管理システム** into a Java web application for managing technical issues.
 
-## Phase 1 Status
+## Project Status
 
-Phase 1 is functionally complete. It provides the first Java / Servlet / JSP / MySQL version of the original Python prototype.
+Phase 1 and Phase 2 are functionally complete. The project now includes the first Java / Servlet / JSP / MySQL implementation plus usability, validation, error-handling, search, and comment-thread improvements.
 
 ## Features
 
-- Issue list with live comment counts
-- Issue detail view
-- Create, edit, and delete issues
-- Keyword search across issue fields
+- Issue list and detail views with live comment counts
+- Create, edit, and delete issues with server-side validation
+- Responsive shared navigation and consistent page styling
+- Priority, status, progress, and due-date indicators
+- Combined keyword, priority, and status search filters
+- Safe sorting by registration, update time, due date, or priority
 - Statistics by status and priority
-- Add comments with To and CC recipients
-- Reply to a comment
+- Threaded comments with To and CC recipients
+- Reply previews, automatic reply recipients, and comment validation
+- Friendly success and error messages
 - MySQL persistence with UTF-8 support
 
 ## Technology
@@ -33,20 +36,24 @@ technical-issue-manager-java/
 ├── pom.xml
 ├── README.md
 ├── docs/
-│   └── phase1-manual-test-checklist.md
+│   ├── phase1-manual-test-checklist.md
+│   └── phase2-manual-test-checklist.md
 └── src/
     └── main/
         ├── java/com/example/technicalissuemanager/
         │   ├── dao/
         │   ├── model/
         │   ├── servlet/
-        │   └── util/
+        │   ├── util/
+        │   └── validation/
         ├── resources/sql/
         │   ├── schema.sql
         │   └── sample-data.sql
-        └── webapp/WEB-INF/
-            ├── jsp/
-            └── web.xml
+        └── webapp/
+            ├── css/
+            └── WEB-INF/
+                ├── jsp/
+                └── web.xml
 ```
 
 ## Database Setup
@@ -147,8 +154,9 @@ http://localhost:8080/technical-issue-manager/issues
 
 ## Verification
 
-See [Phase 1 manual test checklist](docs/phase1-manual-test-checklist.md).
+- [Phase 1 baseline manual test checklist](docs/phase1-manual-test-checklist.md)
+- [Phase 2 current manual test checklist](docs/phase2-manual-test-checklist.md)
 
 ## Scope
 
-This repository currently covers Phase 1 only. Phase 2 will address UI refinement, stronger validation, error-handling cleanup, and search or comment-display improvements. Phase 3 will cover formal tests, presentation preparation, final refactoring, and deployment preparation.
+Phase 1 and Phase 2 are complete. Phase 3 has not started yet and will cover automated tests, presentation preparation, final documentation and refactoring, and deployment preparation.

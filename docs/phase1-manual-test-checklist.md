@@ -1,5 +1,7 @@
 # Phase 1 Manual Test Checklist
 
+> This checklist records the Phase 1 baseline. For the current application behavior, use the [Phase 2 checklist](phase2-manual-test-checklist.md).
+
 Run these checks after MySQL and Tomcat are running. Use the application URL:
 
 ```text
@@ -39,7 +41,7 @@ http://localhost:8080/technical-issue-manager
 - [ ] Search with a matching keyword, such as `portal`.
 - [ ] Confirm matching issues appear.
 - [ ] Search with a non-matching keyword and confirm the 0-result message.
-- [ ] Submit a blank keyword and confirm the input message.
+- [ ] Phase 1 baseline: submitting a blank keyword displayed an input message. Phase 2 intentionally allows searches without a keyword.
 
 ## 6. Statistics
 
