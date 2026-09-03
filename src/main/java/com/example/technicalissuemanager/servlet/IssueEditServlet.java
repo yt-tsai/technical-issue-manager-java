@@ -2,6 +2,8 @@ package com.example.technicalissuemanager.servlet;
 
 import com.example.technicalissuemanager.dao.IssueDao;
 import com.example.technicalissuemanager.model.Issue;
+import com.example.technicalissuemanager.validation.IssueFormValidationException;
+import com.example.technicalissuemanager.validation.IssueFormValidator;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -11,8 +13,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 @WebServlet("/issues/edit")
@@ -23,9 +23,6 @@ public class IssueEditServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html; charset=UTF-8");
-        response.setCharacterEncoding("UTF-8");
-
         int issueId = parseIssueId(request, response);
         if (issueId == 0) {
             return;
@@ -39,7 +36,7 @@ public class IssueEditServlet extends HttpServlet {
             }
 
             request.setAttribute("issue", issue.get());
-            request.getRequestDispatcher("/WEB-INF/jsp/issue-edit.jsp").forward(request, response);
+            showForm(request, response);
         } catch (SQLException exception) {
             throw new ServletException("課題編集画面の取得に失敗しました。", exception);
         }
@@ -56,7 +53,7 @@ public class IssueEditServlet extends HttpServlet {
         }
 
         try {
-            Issue issue = createIssue(request);
+            Issue issue = IssueFormValidator.validate(request);
             issue.setId(issueId);
 
             if (!issueDao.update(issue)) {
@@ -65,11 +62,22 @@ public class IssueEditServlet extends HttpServlet {
             }
 
             response.sendRedirect(request.getContextPath() + "/issues/detail?id=" + issueId);
-        } catch (IllegalArgumentException exception) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, exception.getMessage());
+        } catch (IssueFormValidationException exception) {
+            Issue formIssue = new Issue();
+            formIssue.setId(issueId);
+            request.setAttribute("issue", formIssue);
+            request.setAttribute("errors", exception.getErrors());
+            showForm(request, response);
         } catch (SQLException exception) {
             throw new ServletException("課題の更新に失敗しました。", exception);
         }
+    }
+
+    private void showForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html; charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        request.getRequestDispatcher("/WEB-INF/jsp/issue-edit.jsp").forward(request, response);
     }
 
     private int parseIssueId(HttpServletRequest request, HttpServletResponse response)
@@ -80,42 +88,5 @@ public class IssueEditServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "課題IDが正しくありません。");
             return 0;
         }
-    }
-
-    private Issue createIssue(HttpServletRequest request) {
-        Issue issue = new Issue();
-        issue.setTitle(requiredValue(request, "title"));
-        issue.setCustomer(requiredValue(request, "customer"));
-        issue.setProduct(requiredValue(request, "product"));
-        issue.setPriority(requiredValue(request, "priority"));
-        issue.setStatus(requiredValue(request, "status"));
-        issue.setAssignee(requiredValue(request, "assignee"));
-        issue.setDescription(requiredValue(request, "description"));
-
-        try {
-            issue.setProgress(Integer.parseInt(requiredValue(request, "progress")));
-        } catch (NumberFormatException exception) {
-            throw new IllegalArgumentException("進捗率は0から100までの整数で入力してください。");
-        }
-
-        if (issue.getProgress() < 0 || issue.getProgress() > 100) {
-            throw new IllegalArgumentException("進捗率は0から100までの整数で入力してください。");
-        }
-
-        try {
-            issue.setDueDate(LocalDate.parse(requiredValue(request, "dueDate")));
-        } catch (DateTimeParseException exception) {
-            throw new IllegalArgumentException("期限を正しい日付で入力してください。");
-        }
-
-        return issue;
-    }
-
-    private String requiredValue(HttpServletRequest request, String parameterName) {
-        String value = request.getParameter(parameterName);
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException("必須項目を入力してください。");
-        }
-        return value.trim();
     }
 }
