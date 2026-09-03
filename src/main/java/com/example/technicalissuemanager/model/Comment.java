@@ -11,6 +11,8 @@ public class Comment {
 
     private int commentId;
     private Integer replyTo;
+    private Comment replyToComment;
+    private int threadDepth;
     private String author;
     private String to;
     private List<String> cc = new ArrayList<>();
@@ -45,6 +47,22 @@ public class Comment {
 
     public void setReplyTo(Integer replyTo) {
         this.replyTo = replyTo;
+    }
+
+    public Comment getReplyToComment() {
+        return replyToComment;
+    }
+
+    public void setReplyToComment(Comment replyToComment) {
+        this.replyToComment = replyToComment;
+    }
+
+    public int getThreadDepth() {
+        return threadDepth;
+    }
+
+    public void setThreadDepth(int threadDepth) {
+        this.threadDepth = threadDepth;
     }
 
     public String getAuthor() {

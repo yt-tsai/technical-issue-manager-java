@@ -4,12 +4,32 @@
 <%@ page import="com.example.technicalissuemanager.model.Comment" %>
 <%@ page import="com.example.technicalissuemanager.util.HtmlEscaper" %>
 <%@ page import="com.example.technicalissuemanager.util.IssueViewHelper" %>
+<%!
+    private String commentFormValue(
+            HttpServletRequest request, String fieldName, String defaultValue) {
+        String value = request.getParameter(fieldName);
+        return value == null ? defaultValue : value;
+    }
+%>
 <%
     Issue issue = (Issue) request.getAttribute("issue");
-    List<Comment> comments = (List<Comment>) request.getAttribute("comments");
-    String replyTo = request.getParameter("replyTo");
+    List<Comment> commentThread = (List<Comment>) request.getAttribute("commentThread");
+    Comment replyTarget = (Comment) request.getAttribute("replyTarget");
+    java.util.Map<String, String> commentErrors =
+            (java.util.Map<String, String>) request.getAttribute("commentErrors");
+    if (commentErrors == null) {
+        commentErrors = java.util.Collections.emptyMap();
+    }
+
     String successMessage = (String) request.getAttribute("successMessage");
     String dueDateLabel = IssueViewHelper.dueDateLabel(issue);
+    String defaultTo = replyTarget == null ? issue.getAssignee() : replyTarget.getAuthor();
+    String toValue = request.getParameter("to");
+    if (toValue == null || toValue.isBlank()) {
+        toValue = defaultTo;
+    }
+    java.time.format.DateTimeFormatter commentDateFormatter =
+            java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 %>
 <!DOCTYPE html>
 <html lang="ja">
@@ -55,53 +75,108 @@
         </div>
     </section>
 
-    <section class="comments">
-        <h2>コメント</h2>
-<% if (comments.isEmpty()) { %>
+    <section id="comments" class="comments">
+        <div class="comments-heading">
+            <h2>コメント（<%= commentThread.size() %>件）</h2>
+            <a class="button-link" href="#comment-form">コメントを追加</a>
+        </div>
+<% if (commentThread.isEmpty()) { %>
         <p>コメントはまだありません。</p>
 <% } else {
-       for (Comment comment : comments) { %>
-        <article class="comment">
-            <h3>#<%= comment.getCommentId() %></h3>
-<%         if (comment.getReplyTo() != null) { %>
-            <p class="meta">返信元：#<%= comment.getReplyTo() %></p>
+       for (Comment comment : commentThread) {
+           int displayDepth = Math.min(comment.getThreadDepth(), 3);
+           Comment parentComment = comment.getReplyToComment();
+           String formattedCreatedAt = comment.getCreatedAt() == null
+                   ? ""
+                   : comment.getCreatedAt().format(commentDateFormatter); %>
+        <article id="comment-<%= comment.getCommentId() %>"
+                 class="comment<%= comment.getThreadDepth() > 0
+                         ? " comment-reply comment-depth-" + displayDepth
+                         : "" %>">
+            <div class="comment-header">
+                <h3>#<%= comment.getCommentId() %> <%= HtmlEscaper.escape(comment.getAuthor()) %></h3>
+<%         if (!formattedCreatedAt.isEmpty()) { %>
+                <time datetime="<%= comment.getCreatedAt() %>"><%= formattedCreatedAt %></time>
 <%         } %>
-            <p class="meta">投稿者：<%= HtmlEscaper.escape(comment.getAuthor()) %></p>
-            <p class="meta">To：<%= HtmlEscaper.escape(comment.getTo()) %></p>
-            <p class="meta">CC：<%= HtmlEscaper.escape(comment.getCc().isEmpty() ? "なし" : String.join(", ", comment.getCc())) %></p>
+            </div>
+<%         if (parentComment != null) { %>
+            <p class="reply-context">↳
+                <a href="#comment-<%= parentComment.getCommentId() %>">
+                    #<%= parentComment.getCommentId() %> <%= HtmlEscaper.escape(parentComment.getAuthor()) %>
+                </a>
+                への返信
+            </p>
+<%         } %>
+            <p class="meta comment-recipients">
+                To：<%= HtmlEscaper.escape(comment.getTo()) %>
+                ／ CC：<%= HtmlEscaper.escape(
+                        comment.getCc().isEmpty() ? "なし" : String.join(", ", comment.getCc())) %>
+            </p>
             <p class="comment-content"><%= HtmlEscaper.escape(comment.getContent()) %></p>
-            <p class="meta">日時：<%= comment.getCreatedAt() %></p>
-            <a class="reply-link" href="<%= request.getContextPath() %>/issues/detail?id=<%= issue.getId() %>&replyTo=<%= comment.getCommentId() %>#comment-form">返信</a>
+            <a class="reply-link" href="<%= request.getContextPath() %>/issues/detail?id=<%= issue.getId() %>&replyTo=<%= comment.getCommentId() %>#comment-form">返信する</a>
         </article>
 <%     }
    } %>
 
-        <form id="comment-form" class="comment-form" action="<%= request.getContextPath() %>/comments/create" method="post">
+        <form id="comment-form" class="comment-form"
+              action="<%= request.getContextPath() %>/comments/create#comment-form" method="post">
             <input type="hidden" name="issueId" value="<%= issue.getId() %>">
-<% if (replyTo != null && !replyTo.isBlank()) { %>
-            <input type="hidden" name="replyTo" value="<%= HtmlEscaper.escape(replyTo) %>">
-            <h3>#<%= HtmlEscaper.escape(replyTo) %> への返信</h3>
+            <h3><%= replyTarget == null ? "コメントを追加" : "返信を追加" %></h3>
+
+<% if (replyTarget != null) { %>
+            <input type="hidden" name="replyTo" value="<%= replyTarget.getCommentId() %>">
+            <div class="reply-target">
+                <p class="reply-target-title">
+                    #<%= replyTarget.getCommentId() %> <%= HtmlEscaper.escape(replyTarget.getAuthor()) %> への返信
+                </p>
+                <p class="comment-content"><%= HtmlEscaper.escape(replyTarget.getContent()) %></p>
+            </div>
             <p><a href="<%= request.getContextPath() %>/issues/detail?id=<%= issue.getId() %>#comment-form">返信を取り消す</a></p>
-<% } else { %>
-            <h3>コメントを追加</h3>
+<% } %>
+
+<% if (!commentErrors.isEmpty()) { %>
+            <p class="error-message">入力内容を確認してください。</p>
 <% } %>
             <div class="field">
                 <label for="author">投稿者</label>
-                <input id="author" name="author" type="text" maxlength="255" required>
+                <input id="author" name="author" type="text" maxlength="255"
+                       value="<%= HtmlEscaper.escape(commentFormValue(request, "author", "")) %>"
+                       class="<%= commentErrors.containsKey("author") ? "input-error" : "" %>" required>
+<% if (commentErrors.containsKey("author")) { %>
+                <p class="field-error"><%= HtmlEscaper.escape(commentErrors.get("author")) %></p>
+<% } %>
             </div>
             <div class="field">
                 <label for="to">To</label>
-                <input id="to" name="to" type="text" maxlength="255" value="<%= HtmlEscaper.escape(issue.getAssignee()) %>">
+                <input id="to" name="to" type="text" maxlength="255"
+                       value="<%= HtmlEscaper.escape(toValue) %>"
+                       class="<%= commentErrors.containsKey("to") ? "input-error" : "" %>">
+<% if (commentErrors.containsKey("to")) { %>
+                <p class="field-error"><%= HtmlEscaper.escape(commentErrors.get("to")) %></p>
+<% } %>
             </div>
             <div class="field">
-                <label for="cc">CC（カンマ区切りで複数可）</label>
-                <input id="cc" name="cc" type="text">
+                <label for="cc">CC（カンマ区切りで複数可、最大20件）</label>
+                <input id="cc" name="cc" type="text"
+                       value="<%= HtmlEscaper.escape(commentFormValue(request, "cc", "")) %>"
+                       class="<%= commentErrors.containsKey("cc") ? "input-error" : "" %>">
+<% if (commentErrors.containsKey("cc")) { %>
+                <p class="field-error"><%= HtmlEscaper.escape(commentErrors.get("cc")) %></p>
+<% } %>
             </div>
             <div class="field">
-                <label for="content">コメント内容</label>
-                <textarea id="content" name="content" required></textarea>
+                <label for="content">コメント内容（最大5000文字）</label>
+                <textarea id="content" name="content" maxlength="5000"
+                          class="<%= commentErrors.containsKey("content") ? "input-error" : "" %>"
+                          required><%= HtmlEscaper.escape(
+                                  commentFormValue(request, "content", "")) %></textarea>
+<% if (commentErrors.containsKey("content")) { %>
+                <p class="field-error"><%= HtmlEscaper.escape(commentErrors.get("content")) %></p>
+<% } %>
             </div>
-            <button class="button-primary" type="submit">コメントを追加</button>
+            <button class="button-primary" type="submit">
+                <%= replyTarget == null ? "コメントを追加" : "返信を追加" %>
+            </button>
         </form>
     </section>
 </main>
