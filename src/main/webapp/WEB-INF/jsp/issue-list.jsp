@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.example.technicalissuemanager.model.Issue" %>
+<%@ page import="com.example.technicalissuemanager.util.HtmlEscaper" %>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -18,11 +19,20 @@
         .create-link { display: inline-block; margin-bottom: 1rem; }
         .search-link { display: inline-block; margin: 0 0 1rem 1rem; }
         .statistics-link { display: inline-block; margin: 0 0 1rem 1rem; }
+        .success-message { background: #dcfce7; border: 1px solid #86efac; color: #166534; max-width: 760px; padding: 0.75rem 1rem; }
     </style>
 </head>
 <body>
     <h1>技術課題管理システム</h1>
     <h2>課題一覧</h2>
+<%
+    String successMessage = (String) request.getAttribute("successMessage");
+    if (successMessage != null) {
+%>
+    <p class="success-message"><%= HtmlEscaper.escape(successMessage) %></p>
+<%
+    }
+%>
     <a class="create-link" href="<%= request.getContextPath() %>/issues/create">＋ 課題を新規登録</a>
     <a class="search-link" href="<%= request.getContextPath() %>/issues/search">課題検索</a>
     <a class="statistics-link" href="<%= request.getContextPath() %>/issues/statistics">課題集計</a>

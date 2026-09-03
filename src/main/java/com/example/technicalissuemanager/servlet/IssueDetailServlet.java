@@ -4,6 +4,7 @@ import com.example.technicalissuemanager.dao.IssueDao;
 import com.example.technicalissuemanager.dao.CommentDao;
 import com.example.technicalissuemanager.model.Comment;
 import com.example.technicalissuemanager.model.Issue;
+import com.example.technicalissuemanager.util.FlashMessage;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -42,7 +43,8 @@ public class IssueDetailServlet extends HttpServlet {
                 return;
             }
 
-            request.setAttribute("issue", issue.get());
+            request.setAttribute("issue", issue.get());            request.setAttribute("successMessage", FlashMessage.consumeSuccess(request));
+
             request.setAttribute("comments", commentDao.findByIssueId(issueId));
             request.getRequestDispatcher("/WEB-INF/jsp/issue-detail.jsp").forward(request, response);
         } catch (SQLException exception) {

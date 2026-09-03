@@ -2,6 +2,7 @@ package com.example.technicalissuemanager.servlet;
 
 import com.example.technicalissuemanager.dao.CommentDao;
 import com.example.technicalissuemanager.dao.IssueDao;
+import com.example.technicalissuemanager.util.FlashMessage;
 import com.example.technicalissuemanager.model.Comment;
 import com.example.technicalissuemanager.model.Issue;
 
@@ -46,6 +47,10 @@ public class CommentCreateServlet extends HttpServlet {
             Comment comment = createComment(request, issue.get());
             comment.setReplyTo(parseReplyTo(request, issueId));
             commentDao.save(issueId, comment);
+            String successMessage = comment.getReplyTo() == null
+                    ? "コメントを追加しました。"
+                    : "返信を追加しました。";
+            FlashMessage.setSuccess(request, successMessage);
             response.sendRedirect(request.getContextPath() + "/issues/detail?id=" + issueId);
         } catch (IllegalArgumentException exception) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, exception.getMessage());

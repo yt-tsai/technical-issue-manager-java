@@ -1,6 +1,7 @@
 package com.example.technicalissuemanager.servlet;
 
 import com.example.technicalissuemanager.dao.IssueDao;
+import com.example.technicalissuemanager.util.FlashMessage;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -32,6 +33,8 @@ public class IssueDeleteServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "指定された課題は存在しません。");
                 return;
             }
+
+            FlashMessage.setSuccess(request, "課題を削除しました。");
 
             response.sendRedirect(request.getContextPath() + "/issues");
         } catch (SQLException exception) {

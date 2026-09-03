@@ -1,6 +1,7 @@
 package com.example.technicalissuemanager.servlet;
 
 import com.example.technicalissuemanager.dao.IssueDao;
+import com.example.technicalissuemanager.util.FlashMessage;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -23,6 +24,7 @@ public class IssueListServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         try {
+            request.setAttribute("successMessage", FlashMessage.consumeSuccess(request));
             request.setAttribute("issues", issueDao.findAll());
             request.getRequestDispatcher("/WEB-INF/jsp/issue-list.jsp").forward(request, response);
         } catch (SQLException exception) {

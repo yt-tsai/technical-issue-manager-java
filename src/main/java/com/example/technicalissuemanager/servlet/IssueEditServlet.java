@@ -1,6 +1,7 @@
 package com.example.technicalissuemanager.servlet;
 
 import com.example.technicalissuemanager.dao.IssueDao;
+import com.example.technicalissuemanager.util.FlashMessage;
 import com.example.technicalissuemanager.model.Issue;
 import com.example.technicalissuemanager.validation.IssueFormValidationException;
 import com.example.technicalissuemanager.validation.IssueFormValidator;
@@ -60,6 +61,8 @@ public class IssueEditServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "指定された課題は存在しません。");
                 return;
             }
+
+            FlashMessage.setSuccess(request, "課題を更新しました。");
 
             response.sendRedirect(request.getContextPath() + "/issues/detail?id=" + issueId);
         } catch (IssueFormValidationException exception) {

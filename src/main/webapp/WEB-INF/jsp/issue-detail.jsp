@@ -2,10 +2,12 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.example.technicalissuemanager.model.Issue" %>
 <%@ page import="com.example.technicalissuemanager.model.Comment" %>
+<%@ page import="com.example.technicalissuemanager.util.HtmlEscaper" %>
 <%
     Issue issue = (Issue) request.getAttribute("issue");
     List<Comment> comments = (List<Comment>) request.getAttribute("comments");
     String replyTo = request.getParameter("replyTo");
+    String successMessage = (String) request.getAttribute("successMessage");
 %>
 <!DOCTYPE html>
 <html lang="ja">
@@ -35,11 +37,15 @@
         input, textarea { box-sizing: border-box; width: 100%; padding: 0.55rem; font: inherit; }
         textarea { min-height: 7rem; resize: vertical; }
         button { padding: 0.6rem 1rem; font: inherit; cursor: pointer; }
+        .success-message { background: #dcfce7; border: 1px solid #86efac; color: #166534; max-width: 760px; padding: 0.75rem 1rem; }
     </style>
 </head>
 <body>
     <h1>技術課題管理システム</h1>
     <a class="back-link" href="<%= request.getContextPath() %>/issues">← 課題一覧へ戻る</a>
+<% if (successMessage != null) { %>
+    <p class="success-message"><%= HtmlEscaper.escape(successMessage) %></p>
+<% } %>
 
     <section class="issue">
         <h2>#<%= issue.getId() %> <%= issue.getTitle() %></h2>

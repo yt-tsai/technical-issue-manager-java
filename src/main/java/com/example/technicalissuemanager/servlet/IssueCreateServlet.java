@@ -1,6 +1,7 @@
 package com.example.technicalissuemanager.servlet;
 
 import com.example.technicalissuemanager.dao.IssueDao;
+import com.example.technicalissuemanager.util.FlashMessage;
 import com.example.technicalissuemanager.model.Issue;
 import com.example.technicalissuemanager.validation.IssueFormValidationException;
 import com.example.technicalissuemanager.validation.IssueFormValidator;
@@ -33,6 +34,7 @@ public class IssueCreateServlet extends HttpServlet {
         try {
             Issue issue = IssueFormValidator.validate(request);
             int issueId = issueDao.save(issue);
+            FlashMessage.setSuccess(request, "課題を登録しました。");
             response.sendRedirect(request.getContextPath() + "/issues/detail?id=" + issueId);
         } catch (IssueFormValidationException exception) {
             request.setAttribute("errors", exception.getErrors());
