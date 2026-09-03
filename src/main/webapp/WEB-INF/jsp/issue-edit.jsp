@@ -22,24 +22,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>課題を編集 - 技術課題管理システム</title>
-    <style>
-        body { font-family: sans-serif; margin: 2rem; color: #222; }
-        form { max-width: 760px; }
-        .field { margin: 1rem 0; }
-        label { display: block; font-weight: bold; margin-bottom: 0.35rem; }
-        input, select, textarea { box-sizing: border-box; width: 100%; padding: 0.55rem; font: inherit; }
-        textarea { min-height: 8rem; resize: vertical; }
-        .field-error { color: #b91c1c; margin: 0.35rem 0 0; }
-        .input-error { border: 2px solid #b91c1c; }
-        .actions { display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; }
-        button { padding: 0.6rem 1rem; font: inherit; cursor: pointer; }
-    </style>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css">
 </head>
 <body>
-    <h1>技術課題管理システム</h1>
+<%@ include file="/WEB-INF/jsp/includes/header.jspf" %>
+<main class="container">
     <h2>課題を編集</h2>
 
-    <form action="<%= request.getContextPath() %>/issues/edit?id=<%= issue.getId() %>" method="post">
+    <form class="issue-form" action="<%= request.getContextPath() %>/issues/edit?id=<%= issue.getId() %>" method="post">
         <div class="field">
             <label for="title">タイトル</label>
             <input id="title" name="title" type="text" maxlength="255" value="<%= HtmlEscaper.escape(formValue(request, "title", issue.getTitle())) %>" class="<%= errors.containsKey("title") ? "input-error" : "" %>" required>
@@ -116,5 +106,6 @@
             <a href="<%= request.getContextPath() %>/issues/detail?id=<%= issue.getId() %>">キャンセル</a>
         </div>
     </form>
+</main>
 </body>
 </html>

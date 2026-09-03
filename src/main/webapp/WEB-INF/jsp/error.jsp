@@ -29,20 +29,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>エラー - 技術課題管理システム</title>
-    <style>
-        body { font-family: sans-serif; margin: 2rem; color: #222; }
-        .error { border: 1px solid #ccc; border-radius: 8px; max-width: 640px; padding: 1.5rem; }
-        .status { color: #b91c1c; font-weight: bold; }
-        a { display: inline-block; margin-top: 1rem; }
-    </style>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css">
 </head>
 <body>
-    <h1>技術課題管理システム</h1>
+<%@ include file="/WEB-INF/jsp/includes/header.jspf" %>
+<main class="container">
     <section class="error">
         <p class="status">HTTP <%= statusCode %></p>
         <h2><%= HtmlEscaper.escape(heading) %></h2>
         <p><%= HtmlEscaper.escape(description) %></p>
         <a href="<%= request.getContextPath() %>/issues">課題一覧へ戻る</a>
     </section>
+</main>
 </body>
 </html>

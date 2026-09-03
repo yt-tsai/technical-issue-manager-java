@@ -44,7 +44,9 @@ public class IssueDao {
 
     private static final String SEARCH_SQL =
             "SELECT id, title, customer, product, priority, status, progress, "
-                    + "assignee, due_date, description, created_at, updated_at FROM issues "
+                    + "assignee, due_date, description, created_at, updated_at, "
+                    + "(SELECT COUNT(*) FROM comments WHERE comments.issue_id = issues.id) AS comment_count "
+                    + "FROM issues "
                     + "WHERE LOWER(title) LIKE ? OR LOWER(customer) LIKE ? OR LOWER(product) LIKE ? "
                     + "OR LOWER(priority) LIKE ? OR LOWER(status) LIKE ? OR LOWER(assignee) LIKE ? "
                     + "OR CAST(due_date AS CHAR) LIKE ? OR LOWER(description) LIKE ? ORDER BY id";

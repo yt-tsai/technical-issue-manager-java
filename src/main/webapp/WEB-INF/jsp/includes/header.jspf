@@ -1,0 +1,12 @@
+<%@ page pageEncoding="UTF-8" %>
+<header class="site-header">
+    <div class="site-header__inner">
+        <a class="site-brand" href="<%= request.getContextPath() %>/issues">技術課題管理システム</a>
+        <nav class="site-nav" aria-label="メインナビゲーション">
+            <a href="<%= request.getContextPath() %>/issues">課題一覧</a>
+            <a href="<%= request.getContextPath() %>/issues/create">新規登録</a>
+            <a href="<%= request.getContextPath() %>/issues/search">課題検索</a>
+            <a href="<%= request.getContextPath() %>/issues/statistics">課題集計</a>
+        </nav>
+    </div>
+</header>
