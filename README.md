@@ -4,7 +4,7 @@ A student portfolio project that evolves the Python CLI prototype **技術課題
 
 ## Project Status
 
-Phase 1 and Phase 2 are functionally complete. The project now includes the first Java / Servlet / JSP / MySQL implementation plus usability, validation, error-handling, search, and comment-thread improvements.
+Phase 1 and Phase 2 are functionally complete. Phase 3 is in progress, beginning with automated unit tests and final project preparation.
 
 ## Features
 
@@ -28,6 +28,7 @@ Phase 1 and Phase 2 are functionally complete. The project now includes the firs
 - JSP
 - MySQL 8.0+
 - Apache Tomcat 11 for local development
+- JUnit 6 and Mockito 5 for unit testing
 
 ## Project Structure
 
@@ -39,21 +40,24 @@ technical-issue-manager-java/
 │   ├── phase1-manual-test-checklist.md
 │   └── phase2-manual-test-checklist.md
 └── src/
-    └── main/
-        ├── java/com/example/technicalissuemanager/
-        │   ├── dao/
-        │   ├── model/
-        │   ├── servlet/
-        │   ├── util/
-        │   └── validation/
-        ├── resources/sql/
-        │   ├── schema.sql
-        │   └── sample-data.sql
-        └── webapp/
-            ├── css/
-            └── WEB-INF/
-                ├── jsp/
-                └── web.xml
+    ├── main/
+    │   ├── java/com/example/technicalissuemanager/
+    │   │   ├── dao/
+    │   │   ├── model/
+    │   │   ├── servlet/
+    │   │   ├── util/
+    │   │   └── validation/
+    │   ├── resources/sql/
+    │   │   ├── schema.sql
+    │   │   └── sample-data.sql
+    │   └── webapp/
+    │       ├── css/
+    │       └── WEB-INF/
+    │           ├── jsp/
+    │           └── web.xml
+    └── test/java/com/example/technicalissuemanager/
+        ├── util/
+        └── validation/
 ```
 
 ## Database Setup
@@ -114,6 +118,16 @@ For a service-managed Tomcat installation, configure the equivalent values in th
 
 Real credentials are intentionally not part of this repository. Keep them in local environment or service configuration and never add them to version control.
 
+## Automated Tests
+
+Run the unit tests from the project root. MySQL and Tomcat do not need to be running.
+
+```bash
+mvn test
+```
+
+The current tests cover HTML escaping, issue form validation, and issue priority, status, and due-date display rules.
+
 ## Build and Run
 
 Build the WAR file:
@@ -159,4 +173,4 @@ http://localhost:8080/technical-issue-manager/issues
 
 ## Scope
 
-Phase 1 and Phase 2 are complete. Phase 3 has not started yet and will cover automated tests, presentation preparation, final documentation and refactoring, and deployment preparation.
+Phase 1 and Phase 2 are complete. Phase 3 is in progress and covers automated tests, presentation preparation, final documentation and refactoring, and deployment preparation.
