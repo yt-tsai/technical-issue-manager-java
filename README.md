@@ -19,6 +19,7 @@ Phase 1 and Phase 2 are functionally complete. Phase 3 is in progress, beginning
 - Reply previews, automatic reply recipients, and comment validation
 - Friendly success and error messages
 - MySQL persistence with UTF-8 support
+- Automated unit tests for validation and utility rules
 
 ## Technology
 
@@ -37,6 +38,7 @@ technical-issue-manager-java/
 ├── pom.xml
 ├── README.md
 ├── docs/
+│   ├── automated-test-cases.md
 │   ├── phase1-manual-test-checklist.md
 │   └── phase2-manual-test-checklist.md
 └── src/
@@ -126,7 +128,7 @@ Run the unit tests from the project root. MySQL and Tomcat do not need to be run
 mvn test
 ```
 
-The current tests cover HTML escaping, issue form validation, and issue priority, status, and due-date display rules.
+The current tests cover HTML escaping, issue and comment form validation, flash messages, and issue priority, status, and due-date display rules. See the [automated test case reference](docs/automated-test-cases.md) for details.
 
 ## Build and Run
 
@@ -168,6 +170,7 @@ http://localhost:8080/technical-issue-manager/issues
 
 ## Verification
 
+- [Automated test case reference](docs/automated-test-cases.md)
 - [Phase 1 baseline manual test checklist](docs/phase1-manual-test-checklist.md)
 - [Phase 2 current manual test checklist](docs/phase2-manual-test-checklist.md)
 
