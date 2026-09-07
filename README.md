@@ -20,6 +20,7 @@ Phase 1 and Phase 2 are functionally complete. Phase 3 is in progress, beginning
 - Friendly success and error messages
 - MySQL persistence with UTF-8 support
 - Automated unit tests for validation and utility rules
+- GitHub Actions verification for every push and pull request to `main`
 
 ## Technology
 
@@ -129,6 +130,15 @@ mvn test
 ```
 
 The current tests cover HTML escaping, issue and comment form validation, flash messages, and issue priority, status, and due-date display rules. See the [automated test case reference](docs/automated-test-cases.md) for details.
+
+### GitHub Actions
+
+The workflow in `.github/workflows/maven.yml` automatically runs the unit tests and builds the WAR file when code is pushed to `main` or a pull request targets `main`.
+
+The workflow uses Java 21 and does not require MySQL or Tomcat. Its result is available from the repository's **Actions** tab on GitHub:
+
+- A green check means the tests and build completed successfully.
+- A red cross means a test or build step failed; open the workflow run to view its log.
 
 ## Build and Run
 
