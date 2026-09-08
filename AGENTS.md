@@ -6,17 +6,16 @@ This repository contains `technical-issue-manager`, a student project that start
 
 ## Current phase
 
-Phase 1: build the Java web foundation from the Python prototype.
+Phase 3 is complete. Version 1.0.0 is the stable student portfolio release.
 
-Focus on:
+Future work should focus on:
 
-- project structure
-- domain models
-- persistence
-- servlet/JSP flow
-- issue CRUD
-- search/statistics
-- comments and reply-to-comment support
+- preserving the completed behavior
+- fixing verified defects
+- keeping documentation and tests synchronized
+- making only small, explainable maintenance changes
+
+Do not begin a new feature phase unless the project owner explicitly requests it.
 
 ## Important domain model
 
@@ -137,10 +136,10 @@ If the repository adds integration tests or servlet tests later, run those too.
 
 - Keep labels and messages consistent with the current prototype terminology.
 - Keep forms simple and readable.
-- Avoid unnecessary styling before core functionality is complete.
-- Prefer clarity over visual polish in Phase 1.
+- Preserve the shared layout and responsive behavior.
+- Prefer clarity over unnecessary visual complexity.
 
 ## Notes for this project
 
 This project is for a school presentation and portfolio use.
-The first Java version should be small, stable, and easy to explain.
+Version 1.0.0 should remain small, stable, and easy to explain.

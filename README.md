@@ -4,7 +4,7 @@ A student portfolio project that evolves the Python CLI prototype **技術課題
 
 ## Project Status
 
-Phase 1 and Phase 2 are functionally complete. Phase 3 is in progress, beginning with automated unit tests and final project preparation.
+Phase 1, Phase 2, and Phase 3 are complete. The current stable project release is version 1.0.0.
 
 ## Features
 
@@ -36,12 +36,14 @@ Phase 1 and Phase 2 are functionally complete. Phase 3 is in progress, beginning
 
 ```text
 technical-issue-manager-java/
+├── .github/workflows/maven.yml
 ├── pom.xml
 ├── README.md
 ├── docs/
 │   ├── automated-test-cases.md
 │   ├── phase1-manual-test-checklist.md
-│   └── phase2-manual-test-checklist.md
+│   ├── phase2-manual-test-checklist.md
+│   └── phase3-final-test-checklist.md
 └── src/
     ├── main/
     │   ├── java/com/example/technicalissuemanager/
@@ -183,7 +185,15 @@ http://localhost:8080/technical-issue-manager/issues
 - [Automated test case reference](docs/automated-test-cases.md)
 - [Phase 1 baseline manual test checklist](docs/phase1-manual-test-checklist.md)
 - [Phase 2 current manual test checklist](docs/phase2-manual-test-checklist.md)
+- [Phase 3 final verification checklist](docs/phase3-final-test-checklist.md)
+
+## Current Scope and Limitations
+
+- This is a student portfolio application intended for local demonstration and learning.
+- It does not include user authentication or role-based authorization.
+- MySQL and Tomcat are configured and operated separately from the application.
+- Automated tests cover validation and utility rules; browser and database workflows use the manual checklists.
 
 ## Scope
 
-Phase 1 and Phase 2 are complete. Phase 3 is in progress and covers automated tests, presentation preparation, final documentation and refactoring, and deployment preparation.
+Version 1.0.0 completes the planned three phases: the Java web foundation, UI and validation improvements, and final testing, documentation, error-handling, and build preparation.
