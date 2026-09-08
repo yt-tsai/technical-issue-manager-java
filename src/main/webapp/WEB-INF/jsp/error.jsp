@@ -18,6 +18,9 @@
         description = errorMessage == null || errorMessage.isBlank()
                 ? "指定されたページまたは課題は存在しません。"
                 : errorMessage;
+    } else if (statusCode == 405) {
+        heading = "許可されていない操作です";
+        description = "このURLでは指定された操作を実行できません。";
     } else {
         heading = "システムエラーが発生しました";
         description = "しばらくしてからもう一度お試しください。";

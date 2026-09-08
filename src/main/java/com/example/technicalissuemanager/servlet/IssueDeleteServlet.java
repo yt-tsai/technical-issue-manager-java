@@ -23,6 +23,9 @@ public class IssueDeleteServlet extends HttpServlet {
         int issueId;
         try {
             issueId = Integer.parseInt(request.getParameter("id"));
+            if (issueId <= 0) {
+                throw new NumberFormatException();
+            }
         } catch (NumberFormatException exception) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "課題IDが正しくありません。");
             return;

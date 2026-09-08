@@ -117,10 +117,12 @@ public class CommentDao {
                 connection.commit();
                 return commentId;
             } catch (SQLException exception) {
-                connection.rollback();
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackException) {
+                    exception.addSuppressed(rollbackException);
+                }
                 throw exception;
-            } finally {
-                connection.setAutoCommit(true);
             }
         }
     }

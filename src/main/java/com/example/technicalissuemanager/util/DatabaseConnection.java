@@ -33,18 +33,6 @@ public final class DatabaseConnection {
         return DriverManager.getConnection(url, user, password);
     }
 
-    private static String getRequiredValue(String environmentName, String propertyName) {
-        String value = getValue(environmentName, propertyName, "");
-
-        if (value.isBlank()) {
-            throw new IllegalStateException(
-                    "Database configuration is missing: set " + environmentName
-                            + " or -D" + propertyName);
-        }
-
-        return value;
-    }
-
     private static String getValue(String environmentName, String propertyName, String defaultValue) {
         String environmentValue = System.getenv(environmentName);
         if (environmentValue != null && !environmentValue.isBlank()) {

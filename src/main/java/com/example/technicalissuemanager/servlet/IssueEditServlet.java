@@ -86,7 +86,11 @@ public class IssueEditServlet extends HttpServlet {
     private int parseIssueId(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         try {
-            return Integer.parseInt(request.getParameter("id"));
+            int issueId = Integer.parseInt(request.getParameter("id"));
+            if (issueId <= 0) {
+                throw new NumberFormatException();
+            }
+            return issueId;
         } catch (NumberFormatException exception) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "課題IDが正しくありません。");
             return 0;
